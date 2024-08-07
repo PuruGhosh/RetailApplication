@@ -17,6 +17,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -91,6 +92,19 @@ public class RewardService {
     response.setRewards(rewardResponses);
     log.info("Successfully reward processed. {}", response);
     return response;
+  }
+
+  /**
+   * Calculate rewards for all customers
+   * @param months
+   * @return
+   */
+  public List<CustomerRewardResponse> getAllCustomerRewards(int months) {
+    List<Customer> customers = customerRepository.findAll();
+    log.info("Finding rewards for {} for {} months", customers,months);
+    return customers.stream()
+            .map(customer -> getCustomerRewards(customer.getId(), months))
+            .toList();
   }
 
   /**

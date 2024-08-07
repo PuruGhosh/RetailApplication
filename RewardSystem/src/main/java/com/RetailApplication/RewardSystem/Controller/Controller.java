@@ -6,6 +6,7 @@ import com.RetailApplication.RewardSystem.Dto.TransactionRequest;
 import com.RetailApplication.RewardSystem.Exception.RewardServiceException;
 import com.RetailApplication.RewardSystem.Service.RewardService;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,12 @@ import org.springframework.web.bind.annotation.*;
 public class Controller {
   @Autowired private RewardService rewardService;
 
+  /**
+   * Get rewards for a customer
+   * @param customerId
+   * @param months
+   * @return
+   */
   @GetMapping("reward/customer/{customerId}")
   public ResponseEntity<CustomerRewardResponse> getCustomerRewards(
       @PathVariable UUID customerId,
@@ -27,6 +34,24 @@ public class Controller {
     return ResponseEntity.ok(response);
   }
 
+  /**
+   * Get rewards for all customers
+   * @param months
+   * @return
+   */
+  @GetMapping("reward")
+  public ResponseEntity<List<CustomerRewardResponse>> getRewardsAllCustomers(@RequestParam(value = "months", defaultValue = "3") int months){
+    if (months < 1 || months > 12) {
+      throw new RewardServiceException("Invalid months. Months must be between 1 and 12.");
+    }
+    return ResponseEntity.ok(rewardService.getAllCustomerRewards(months));
+  }
+
+  /**
+   * Process a single transaction
+   * @param transactionRequest
+   * @return
+   */
   @PostMapping("transaction/createTransaction")
   public ResponseEntity<String> handleTransaction(
       @RequestBody TransactionRequest transactionRequest) {
@@ -41,6 +66,11 @@ public class Controller {
     return ResponseEntity.ok("Transaction processed and rewards awarded");
   }
 
+  /**
+   * Process bulk transactions for a customer
+   * @param bulkTransactionRequest
+   * @return
+   */
   @PostMapping("transaction/createBulkTransaction")
   public ResponseEntity<BulkTransactionRequest> handleBulkTransaction(
       @RequestBody BulkTransactionRequest bulkTransactionRequest) {
@@ -52,4 +82,6 @@ public class Controller {
         rewardService.handleBulkTransactions(
             bulkTransactionRequest.getCustomerId(), bulkTransactionRequest.getTransactions()));
   }
+
+
 }

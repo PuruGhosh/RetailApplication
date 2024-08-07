@@ -100,6 +100,70 @@ class RewardServiceTest {
     }
 
     @Test
+    @DisplayName("Test getAllCustomerRewards success")
+    public void testGetAllCustomerRewards_ValidMonths() {
+        UUID customerId1 = UUID.randomUUID();
+        Customer customer1 = new Customer();
+        customer1.setId(customerId1);
+        customer1.setName("xxx");
+        customer1.setEmail("xxx@example.com");
+        customer1.setPhoneNumber("1234567890");
+
+        UUID customerId2 = UUID.randomUUID();
+        Customer customer2 = new Customer();
+        customer2.setId(customerId2);
+        customer2.setName("yyy");
+        customer2.setEmail("yyy@example.com");
+        customer2.setPhoneNumber("1234567890");
+
+        List<Customer> customers = Arrays.asList(customer1, customer2);
+
+        when(customerRepository.findAll()).thenReturn(customers);
+
+        Transaction transaction1 = new Transaction();
+        transaction1.setId(UUID.randomUUID());
+        transaction1.setCustomer(customer1);
+        transaction1.setAmount(new BigDecimal("120"));
+        transaction1.setTransactionDate(LocalDateTime.now().minusMonths(1));
+
+        Transaction transaction2 = new Transaction();
+        transaction2.setId(UUID.randomUUID());
+        transaction2.setCustomer(customer2);
+        transaction2.setAmount(new BigDecimal("80"));
+        transaction2.setTransactionDate(LocalDateTime.now().minusMonths(2));
+
+        when(customerRepository.findById(customerId1)).thenReturn(Optional.of(customer1));
+        when(customerRepository.findById(customerId2)).thenReturn(Optional.of(customer2));
+        when(transactionRepository.findByCustomerIdAndTransactionDateAfter(eq(customerId1), any(LocalDateTime.class)))
+                .thenReturn(List.of(transaction1));
+        when(transactionRepository.findByCustomerIdAndTransactionDateAfter(eq(customerId2), any(LocalDateTime.class)))
+                .thenReturn(List.of(transaction2));
+
+        List<CustomerRewardResponse> result = rewardService.getAllCustomerRewards(3);
+
+        verify(customerRepository, times(1)).findAll();
+        verify(transactionRepository, times(1)).findByCustomerIdAndTransactionDateAfter(eq(customerId1), any(LocalDateTime.class));
+        verify(transactionRepository, times(1)).findByCustomerIdAndTransactionDateAfter(eq(customerId2), any(LocalDateTime.class));
+
+        assertEquals(2, result.size());
+        assertEquals("xxx", result.get(0).getCustomer().getName());
+        assertEquals(90, result.get(0).getTotalPoints());
+        assertEquals("yyy", result.get(1).getCustomer().getName());
+        assertEquals(30, result.get(1).getTotalPoints());
+    }
+
+    @Test
+    @DisplayName("Test getAllCustomerRewards fails when no customers found")
+    public void testGetAllCustomerRewards_NoCustomers() {
+        when(customerRepository.findAll()).thenReturn(Arrays.asList());
+
+        List<CustomerRewardResponse> result = rewardService.getAllCustomerRewards(3);
+
+        verify(customerRepository).findAll();
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
     @DisplayName("Test handleTransaction success")
     void testHandleTransaction() {
         UUID customerId = UUID.randomUUID();
