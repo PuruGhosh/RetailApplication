@@ -20,7 +20,7 @@ A customer receives 2 points for every dollar spent over $100 in each transactio
 1. Get Rewards:
     + URI: "api/reward/customer/[customerId]?months=[months]"
     + ** Here request parameter 'months' is optional. Default value 3, if not specified.
-    + Functionality: Calculate reward points for a customer for each transaction for given amount of time and prepare a report.
+    + Calculate reward points for a customer for each transaction for given amount of time and prepare a report.
     + Response Body:
    ```json
         {
@@ -100,3 +100,18 @@ A customer receives 2 points for every dollar spent over $100 in each transactio
     }
 
     ```
+3. Purchase:
+   + URI: "/api/transaction/createTransaction"
+   + Method: POST
+   + Process single transaction.
+   + Req Body:
+   ```json
+   {
+    "customerId": "123e4567-e89b-12d3-a456-426614174001",
+    "amount": 101
+   }
+   ```
+   + Response Body:
+   ```
+   Transaction processed and rewards awarded
+   ```
