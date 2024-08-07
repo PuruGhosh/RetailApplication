@@ -26,6 +26,11 @@ public class RewardService {
 
   @Autowired private CustomerRepository customerRepository;
 
+  /**
+   * Calculate reward points based on purchase amount
+   * @param amount
+   * @return
+   */
   public int calculatePoints(BigDecimal amount) {
     int points = 0;
     int amountInt = amount.intValue(); // Discard the decimal part
@@ -40,6 +45,12 @@ public class RewardService {
     return points;
   }
 
+  /**
+   * Calculate rewards and prepare report for a customer for given number of months
+   * @param customerId
+   * @param months
+   * @return
+   */
   public CustomerRewardResponse getCustomerRewards(UUID customerId, int months) {
     Customer customer =
         customerRepository
@@ -82,6 +93,12 @@ public class RewardService {
     return response;
   }
 
+  /**
+   * Handle and process single transaction for a customer Id
+   * @param customerId
+   * @param amount
+   * @param transactionDate
+   */
   @Transactional
   public void handleTransaction(UUID customerId, BigDecimal amount, LocalDateTime transactionDate) {
     if (amount.compareTo(BigDecimal.ZERO) <= 0) {
@@ -109,6 +126,12 @@ public class RewardService {
     transactionRepository.save(transaction);
   }
 
+  /**
+   * Handle single transactiom when customer details already provided
+   * @param customer
+   * @param amount
+   * @param transactionDate
+   */
   @Transactional
   public void handleTransaction(
       Customer customer, BigDecimal amount, LocalDateTime transactionDate) {
@@ -131,6 +154,12 @@ public class RewardService {
     transactionRepository.save(transaction);
   }
 
+  /**
+   * Process multiple transactions for a customer
+   * @param customerId
+   * @param transactionRequests
+   * @return
+   */
   public BulkTransactionRequest handleBulkTransactions(
       UUID customerId, List<BulkSubTransaction> transactionRequests) {
     Customer customer =
