@@ -16,6 +16,13 @@ A customer receives 2 points for every dollar spent over $100 in each transactio
 3. Insert some data.(Examples in evidence folder)
 4. Pull the repository and Run.
 
+## Flow Diagram:
+#### Get Rewards for a customer:
+![Flow Diagram 1](Doc/flow_diagram/get_reward_customer_flow.png)
+
+#### Get Rewards for all customers:
+![Flow Diagram 2](Doc/flow_diagram/get_rewards_for_all_customer_flow.png)
+
 ## API Documentation:
 1. Get Rewards:
     + URI: "api/reward/customer/[customerId]?months=[months]"
